@@ -37,6 +37,8 @@ package
 		[Embed(source = "../res/suburbroom_empty.png")] public static const room_suburb:Class;
 		
 		
+		[Embed(source = "../res/arrow.png")] public static const arrow:Class;
+		
 	}
 
 }

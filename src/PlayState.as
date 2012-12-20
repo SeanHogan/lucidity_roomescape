@@ -14,6 +14,7 @@ package
 		private const S_SUBURB:int = 1;
 		private const S_CITY:int = 2;
 		private const S_DONE:int = 3;
+		private const S_WINDOW:int = 4;
 		
 		private var g_bg:FlxSprite =  new FlxSprite;
 		
@@ -24,9 +25,17 @@ package
 		private var g_key:FlxSprite = new FlxSprite(265, 508, Assets.key);
 		private var g_sm_fam_port:FlxSprite = new FlxSprite(463, 18, Assets.familyportrait_small);
 		private var g_laundry:FlxSprite = new FlxSprite(324, 392);
+		private var g_suburb_door:FlxSprite = new FlxSprite(720, 220);
 		private var group_suburb:FlxGroup = new FlxGroup;
 		
+		private var g_city_door:FlxSprite = new FlxSprite(3, 3);
+		private var g_city_clock:FlxSprite = new FlxSprite(290, 46);
+		private var g_cellphone:FlxSprite = new FlxSprite(272, 266, Assets.cellphone);
+		private var g_pictures:FlxSprite = new FlxSprite(112, 69, Assets.pictures);
+		private var g_window:FlxSprite = new FlxSprite(715, 58);
 		private var group_city:FlxGroup = new FlxGroup;
+		
+		private var g_arrow:FlxSprite = new FlxSprite(10, 10);
 		
 		override public function create():void 
 		{
@@ -36,8 +45,23 @@ package
 			
 			add(g_bg);
 			
+			// City graphical assets
+			g_city_door.makeGraphic(50, 450, 0x00ffffff);
+			group_city.add(g_city_door);
+			
+			g_city_clock.makeGraphic(50, 50, 0x00ffffff);
+			group_city.add(g_city_clock);
+			
+			group_city.add(g_cellphone);
+			group_city.add(g_pictures);
+			
+			g_window.makeGraphic(83, 178, 0x00ffffff);
+			group_city.add(g_window);
+			
+			// Suburb graphical assets
 			g_fish.loadGraphic(Assets.fishup, true, false, 116, 54);
 			g_fish.frame = 1;
+			
 			group_suburb.add(g_fish);
 			
 			g_clock.loadGraphic(Assets.clock, true, false, 84, 105);
@@ -58,11 +82,25 @@ package
 			
 			g_laundry.loadGraphic(Assets.laundry, true, false, 250, 170);
 			g_laundry.frame = 1;
+			g_laundry.width = g_laundry.width - 120;
+			g_laundry.offset.x = 130;
+			g_laundry.x += 130;
+			g_laundry.height = 100;
+			g_laundry.offset.y = 35;
+			g_laundry.y += 35;
 			group_suburb.add(g_laundry);
+			
+			g_suburb_door.makeGraphic(80, 80, 0x00ffffff);
+			group_suburb.add(g_suburb_door);
 			
 			add(group_suburb);
 			add(group_city);
 			group_city.exists = false;
+			
+			// other
+			g_arrow.loadGraphic(Assets.arrow, true, false, 100, 100);
+			g_arrow.visible = false;
+			add(g_arrow);
 			
 			Mouse.show();
 
@@ -72,9 +110,15 @@ package
 		{
 			super.destroy();
 		}
+		
+		
+		private var jp_mouse:Boolean = false;
+		
 		override public function update():void 
 		{
-			
+			Mouse.show();
+			Mouse.cursor = MouseCursor.ARROW;
+			jp_mouse = FlxG.mouse.justPressed();
 			switch (state) {
 				case S_INTRO:
 					update_intro();
@@ -88,6 +132,9 @@ package
 				case S_DONE:
 					update_done();
 					break;
+				case S_WINDOW:
+					update_window();
+					break;
 			}
 			super.update();
 		}
@@ -96,10 +143,9 @@ package
 			state = S_SUBURB;
 		}
 		
-		private var jp_mouse:Boolean = false;
+		
+		
 		private function update_suburb():void {
-			Mouse.cursor = MouseCursor.ARROW;
-			jp_mouse = FlxG.mouse.justPressed();
 			
 			// Need to click fish first
 			if (g_fish.alive) {
@@ -125,6 +171,7 @@ package
 						g_rug.alive = false;
 						g_key.visible = true;
 						g_rug.frame = 0;
+						return;
 					}
 				}
 				
@@ -153,6 +200,16 @@ package
 						g_laundry.alive = false;
 					}
 				}
+				
+				if (R.gs[R.GS_GOT_KEY] && mouse_in(g_suburb_door)) {
+					hand();
+					if (jp_mouse) {
+						group_suburb.exists = false;
+						group_city.exists = true;
+						state = S_CITY;
+						g_bg.loadGraphic(Assets.room_city, false, false, 800, 600);
+					}
+				}
 			}
 		}
 		
@@ -160,7 +217,55 @@ package
 			Mouse.cursor = MouseCursor.HAND;
 		}
 		private function update_city():void {
+			if (mouse_in(g_city_door)) {
+				hand();
+				if (jp_mouse) {
+					group_city.exists = false;
+					group_suburb.exists = true;
+					state = S_SUBURB;
+					g_bg.loadGraphic(Assets.room_suburb, false, false, 800, 600);
+				}
+			}
 			
+			if (mouse_in(g_cellphone)) {
+				hand();
+				if (jp_mouse) {
+					
+				}
+			}
+			
+			if (mouse_in(g_pictures)) {
+				hand();
+				if (jp_mouse) {
+					
+				}
+			}
+			
+			if (mouse_in(g_window)) {
+				hand();
+				if (jp_mouse) {
+					state = S_WINDOW;
+					group_city.exists = false;
+					g_arrow.visible = true;
+					g_bg.loadGraphic(Assets.windowclose, false, false, 800, 600);
+				}
+			}
+			
+		}
+		
+		private function update_window():void {
+			if (mouse_in(g_arrow)) {
+				g_arrow.frame = 1;
+				hand();
+				if (jp_mouse) {
+					state = S_CITY;
+					group_city.exists = true;
+					g_arrow.visible = false;
+					g_bg.loadGraphic(Assets.room_city, false, false, 800, 600);
+				}
+			} else {
+				g_arrow.frame = 0;
+			}
 		}
 		private function update_done():void {
 			
