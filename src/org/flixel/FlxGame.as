@@ -594,7 +594,6 @@ package org.flixel
 		protected function updateSoundTray(MS:Number):void
 		{
 			//animate stupid sound tray thing
-			
 			if(_soundTray != null)
 			{
 				if(_soundTrayTimer > 0)

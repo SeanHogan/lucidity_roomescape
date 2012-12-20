@@ -6,6 +6,8 @@ package
 	import org.flixel.FlxGroup;
 	import org.flixel.FlxSprite;
 	import org.flixel.FlxState;
+	import org.flixel.FlxText;
+	import org.flixel.FlxU;
 	public class PlayState  extends FlxState
 	{
 		
@@ -15,6 +17,10 @@ package
 		private const S_CITY:int = 2;
 		private const S_DONE:int = 3;
 		private const S_WINDOW:int = 4;
+		private const S_BIG_MARISA:int = 5;
+		private const S_BIG_PIC:int = 6;
+		private const S_BIG_CLOCK:int = 7;
+		private const S_CELLPHONE:int = 8;
 		
 		private var g_bg:FlxSprite =  new FlxSprite;
 		
@@ -33,9 +39,13 @@ package
 		private var g_cellphone:FlxSprite = new FlxSprite(272, 266, Assets.cellphone);
 		private var g_pictures:FlxSprite = new FlxSprite(112, 69, Assets.pictures);
 		private var g_window:FlxSprite = new FlxSprite(715, 58);
+		private var text_window:FlxText = new FlxText(300, 200, 300);
+		private var g_marisa:FlxSprite = new FlxSprite(152, 152);
 		private var group_city:FlxGroup = new FlxGroup;
 		
 		private var g_arrow:FlxSprite = new FlxSprite(10, 10);
+		private var g_black_overlay:FlxSprite = new FlxSprite(0, 0);
+		private var g_lg_fam_port:FlxSprite = new FlxSprite(0, 0, Assets.familyportrait);
 		
 		override public function create():void 
 		{
@@ -57,6 +67,9 @@ package
 			
 			g_window.makeGraphic(83, 178, 0x00ffffff);
 			group_city.add(g_window);
+			
+			g_marisa.makeGraphic(30, 30, 0x00ffffff);
+			group_city.add(g_marisa);
 			
 			// Suburb graphical assets
 			g_fish.loadGraphic(Assets.fishup, true, false, 116, 54);
@@ -98,9 +111,22 @@ package
 			group_city.exists = false;
 			
 			// other
+			text_window.visible = false;
+			text_window.size = 32;
+			add(text_window);
+			
+			g_black_overlay.makeGraphic(800, 600, 0xcc000000);
+			g_black_overlay.visible = false;
+			add(g_black_overlay);
+			
 			g_arrow.loadGraphic(Assets.arrow, true, false, 100, 100);
 			g_arrow.visible = false;
 			add(g_arrow);
+			
+			g_lg_fam_port.x = (FlxG.width - g_lg_fam_port.width) / 2;
+			g_lg_fam_port.y = (FlxG.height - g_lg_fam_port.height) / 2;
+			g_lg_fam_port.visible = false;
+			add(g_lg_fam_port);
 			
 			Mouse.show();
 
@@ -134,6 +160,18 @@ package
 					break;
 				case S_WINDOW:
 					update_window();
+					break;
+				case S_BIG_MARISA:
+					update_marisa();
+					break;
+				case S_BIG_PIC:
+					update_pic();
+					break;
+				case S_BIG_CLOCK:
+					update_clock();
+					break;
+				case S_CELLPHONE:
+					update_cellphone();
 					break;
 			}
 			super.update();
@@ -191,6 +229,12 @@ package
 				
 				if (mouse_in(g_sm_fam_port)) {
 					hand();
+					if (jp_mouse) {
+						g_black_overlay.visible = true;
+						g_arrow.visible = true;
+						g_lg_fam_port.visible = true;
+						state = S_BIG_PIC;
+					}
 				}
 				
 				if (g_laundry.alive && mouse_in(g_laundry)) {
@@ -230,30 +274,148 @@ package
 			if (mouse_in(g_cellphone)) {
 				hand();
 				if (jp_mouse) {
-					
+					state = S_CELLPHONE;
+					group_city.exists = false;
+					g_bg.loadGraphic(Assets.phonescreen_off, false, false, 800, 600);
+					g_arrow.visible = true;
 				}
 			}
 			
-			if (mouse_in(g_pictures)) {
+			if (mouse_in(g_city_clock)) {
 				hand();
 				if (jp_mouse) {
-					
+					state = S_BIG_CLOCK;
+					group_city.exists = false;
+					g_bg.loadGraphic(Assets.screen_clock, false, false, 800, 600);
+					g_arrow.visible = true;
 				}
 			}
-			
+			//
+			//if (mouse_in(g_pictures)) {
+				//hand();
+				//if (jp_mouse) {
+					//
+				//}
+			//}
+			//
 			if (mouse_in(g_window)) {
 				hand();
 				if (jp_mouse) {
 					state = S_WINDOW;
 					group_city.exists = false;
 					g_arrow.visible = true;
+					text_window.visible = true;
 					g_bg.loadGraphic(Assets.windowclose, false, false, 800, 600);
+				}
+			}
+			
+			if (mouse_in(g_marisa)) {
+				hand();
+				if (jp_mouse) {
+					state = S_BIG_MARISA;
+					group_city.exists = false;
+					g_arrow.visible = true;
+					g_bg.loadGraphic(Assets.marisa_picture, false, false, 800, 600);
 				}
 			}
 			
 		}
 		
+		private function update_marisa():void {
+			if (mouse_in(g_arrow)) {
+				g_arrow.frame = 1;
+				hand();
+				if (jp_mouse) {
+					state = S_CITY;
+					group_city.exists = true;
+					g_arrow.visible = false;
+					g_bg.loadGraphic(Assets.room_city, false, false, 800, 600);
+				}
+			} else {
+				g_arrow.frame = 0;
+			}
+		}
+		
+		private var cur_code:String = "";
+		private var nrs:Array = new Array("ZERO", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE");
+		private var nr_map:Object = { "ZERO":0, "ONE":1, "TWO":2, "THREE":3, "FOUR":4, "FIVE":5, "SIX":6, "SEVEN":7, "EIGHT":8, "NINE":9 };
 		private function update_window():void {
+			if (mouse_in(g_arrow)) {
+				g_arrow.frame = 1;
+				hand();
+				if (jp_mouse) {
+					state = S_CITY;
+					group_city.exists = true;
+					g_arrow.visible = false;
+					text_window.visible = false;
+					g_bg.loadGraphic(Assets.room_city, false, false, 800, 600);
+					cur_code = "";
+				}
+			} else {
+				g_arrow.frame = 0;
+			}
+			
+			text_window.text = "Enter Code\n\n" + cur_code + "\n-------------";
+			
+			for each (var s:String in nrs) {
+				if (FlxG.keys.justPressed(s)) {
+					if (cur_code.length < 10) {
+						if (cur_code == "Incorrect") cur_code = "";
+						cur_code += nr_map[s].toString();
+					}
+					break;
+				}
+			}
+			
+			if (cur_code.length > 0 && FlxG.keys.justPressed("BACKSPACE")) {
+				cur_code = cur_code.slice(0, cur_code.length -1);
+			}
+			
+			if (FlxG.keys.justPressed("ENTER")) {
+				if (cur_code == "0000000000") {
+					g_bg.loadGraphic(Assets.windowopen);
+					text_window.text = "\n\nClick to continue";
+					state = S_DONE;
+				} else {
+					cur_code = "Incorrect";
+				}
+			}
+		}
+		
+		private function update_clock():void {
+			if (mouse_in(g_arrow)) {
+				g_arrow.frame = 1;
+				hand();
+				if (jp_mouse) {
+					state = S_CITY;
+					group_city.exists = true;
+					g_arrow.visible = false;
+					g_bg.loadGraphic(Assets.room_city, false, false, 800, 600);
+				}
+			} else {
+				g_arrow.frame = 0;
+			}
+			
+		}
+
+		private function update_pic():void {
+			if (mouse_in(g_arrow)) {
+				g_arrow.frame = 1;
+				hand();
+				if (jp_mouse) {
+					state = S_SUBURB;
+					group_city.exists = true;
+					g_arrow.visible = false;
+					g_black_overlay.visible = false;
+					g_lg_fam_port.visible = false;
+				}
+			} else {
+				g_arrow.frame = 0;
+			}
+			
+		}
+		
+		private function update_cellphone():void {
 			if (mouse_in(g_arrow)) {
 				g_arrow.frame = 1;
 				hand();
@@ -268,7 +430,12 @@ package
 			}
 		}
 		private function update_done():void {
-			
+			if (mouse_in(text_window)) {
+				hand();
+				if (jp_mouse) {
+					FlxU.openURL("http://luciditygame.com/video2.html");
+				}
+			}
 		}
 		
 		private function mouse_in(o:FlxSprite):Boolean {

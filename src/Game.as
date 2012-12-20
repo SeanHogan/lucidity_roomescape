@@ -7,6 +7,7 @@ package
 		public function Game () {
 		
 			super(800, 600, PlayState);
+			useSoundHotKeys = false;
 		}
 		
 		
