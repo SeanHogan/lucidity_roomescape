@@ -1,5 +1,6 @@
 package  
 {
+	import org.flixel.FlxSound;
 	public class Assets 
 	{
 		[Embed(source = "../res/ok_fishdown.png")] public static const fishdown:Class;
@@ -39,6 +40,48 @@ package
 		
 		[Embed(source = "../res/arrow.png")] public static const arrow:Class;
 		
+		//
+		
+		[Embed(source = "../res/mp3/oh that's my old diary.mp3")] public static const s_book:Class;
+		[Embed(source = "../res/mp3/I keep my books here.mp3")] public static const  s_bookshelf:Class;
+		[Embed(source = "../res/mp3/that's better I can move now.mp3")] public static const s_fish:Class;
+		[Embed(source = "../res/mp3/I can't move.mp3")] public static const s_before_fish:Class;
+		[Embed(source = "../res/mp3/oops I was always a little neater.mp3")] public static const s_laundry:Class;
+		[Embed(source = "../res/mp3/that was rico's number.mp3")] public static const  s_jersey:Class;
+		[Embed(source = "../res/mp3/locked door.mp3")] public static const s_door_before_key:Class;
+		[Embed(source = "../res/mp3/the carpet was always so soft here 1.mp3")] public static const  s_floor_suburb:Class;
+		[Embed(source = "../res/mp3/oh look under the rug.mp3")] public static const s_on_rug:Class;
+		[Embed(source = "../res/mp3/I wonder what this opens.mp3")] public static const  s_on_key:Class;
+		[Embed(source = "../res/mp3/the room at my dad's house.mp3")] public static const  s_enter_city:Class;
+		[Embed(source = "../res/mp3/I haven't seen this room in so long.mp3")] public static const s_city_floor:Class;
+		[Embed(source = "../res/mp3/my old cellphone.mp3")] public static const s_cellphone:Class;
+		[Embed(source = "../res/mp3/this window is stuck!.mp3")] public static const  s_window:Class;
+		[Embed(source = "../res/mp3/Zaria Girl.mp3")] public static const  s_cellphone_message:Class;
+		[Embed(source = "../res/mp3/Father's Room Soundtrack.mp3")] public static const  s_city_song:Class;
+		
+		private static var snd:FlxSound;
+		private static var song:FlxSound;
+		
+		public static function init():void {
+			snd = new FlxSound;
+			song = new FlxSound;
+		}
+		public static function play_sound(embed:Class):void {
+			snd.loadEmbedded(embed);
+			snd.play(true);
+		}
+		
+		public static function stop_sound():void {
+			snd.stop();
+		}
+		
+		public static function stop_song():void {
+			song.stop();
+		}
+		public static function start_song():void {
+			song.loadEmbedded(s_city_song, true);
+			song.play(true);
+		}
 	}
 
 }

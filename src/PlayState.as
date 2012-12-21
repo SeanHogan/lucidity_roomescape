@@ -4,6 +4,7 @@ package
 	import flash.ui.MouseCursor;
 	import org.flixel.FlxG;
 	import org.flixel.FlxGroup;
+	import org.flixel.FlxSave;
 	import org.flixel.FlxSprite;
 	import org.flixel.FlxState;
 	import org.flixel.FlxText;
@@ -21,6 +22,7 @@ package
 		private const S_BIG_PIC:int = 6;
 		private const S_BIG_CLOCK:int = 7;
 		private const S_CELLPHONE:int = 8;
+		private const S_DIARY:int = 9;
 		
 		private var g_bg:FlxSprite =  new FlxSprite;
 		
@@ -32,6 +34,8 @@ package
 		private var g_sm_fam_port:FlxSprite = new FlxSprite(463, 18, Assets.familyportrait_small);
 		private var g_laundry:FlxSprite = new FlxSprite(324, 392);
 		private var g_suburb_door:FlxSprite = new FlxSprite(720, 220);
+		private var g_alone_book:FlxSprite = new FlxSprite(605, 394);
+		private var g_suburb_carpet:FlxSprite = new FlxSprite(0, 540);
 		private var group_suburb:FlxGroup = new FlxGroup;
 		
 		private var g_city_door:FlxSprite = new FlxSprite(3, 3);
@@ -41,8 +45,12 @@ package
 		private var g_window:FlxSprite = new FlxSprite(715, 58);
 		private var text_window:FlxText = new FlxText(300, 200, 300);
 		private var g_marisa:FlxSprite = new FlxSprite(152, 152);
+		private var g_city_floor:FlxSprite = new FlxSprite(57, 462);
 		private var group_city:FlxGroup = new FlxGroup;
 		
+		private var g_diary_back_arrow:FlxSprite = new FlxSprite(330, 510);
+		private var g_diary_forward_arrow:FlxSprite = new FlxSprite(510, 510);
+		private var g_cellphone_big_active_region:FlxSprite = new FlxSprite(200, 320);
 		private var g_arrow:FlxSprite = new FlxSprite(10, 10);
 		private var g_black_overlay:FlxSprite = new FlxSprite(0, 0);
 		private var g_lg_fam_port:FlxSprite = new FlxSprite(0, 0, Assets.familyportrait);
@@ -71,6 +79,9 @@ package
 			g_marisa.makeGraphic(30, 30, 0x00ffffff);
 			group_city.add(g_marisa);
 			
+			g_city_floor.makeGraphic(687, 119, 0x00ffffff);
+			group_city.add(g_city_floor);
+			
 			// Suburb graphical assets
 			g_fish.loadGraphic(Assets.fishup, true, false, 116, 54);
 			g_fish.frame = 1;
@@ -81,6 +92,11 @@ package
 			group_suburb.add(g_clock);
 			
 			g_book.loadGraphic(Assets.books, true, false, 63, 105);
+			g_book.width /= 2;
+			g_book.height /= 2;
+			g_book.x += 40;
+			g_book.offset.x = 40;
+			
 			g_book.visible = false;
 			group_suburb.add(g_book);
 			
@@ -106,6 +122,12 @@ package
 			g_suburb_door.makeGraphic(80, 80, 0x00ffffff);
 			group_suburb.add(g_suburb_door);
 			
+			g_alone_book.makeGraphic(50, 25, 0x00ff0f0f);
+			group_suburb.add(g_alone_book);
+			
+			g_suburb_carpet.makeGraphic(FlxG.width, 60, 0x00ff0f0f);
+			group_suburb.add(g_suburb_carpet);
+			
 			add(group_suburb);
 			add(group_city);
 			group_city.exists = false;
@@ -114,6 +136,20 @@ package
 			text_window.visible = false;
 			text_window.size = 32;
 			add(text_window);
+			
+			g_diary_back_arrow.loadGraphic(Assets.arrow, true, false, 100, 100);
+			g_diary_back_arrow.visible = false;
+			g_diary_back_arrow.scale.x = g_diary_back_arrow.scale.y = 0.5;
+			add(g_diary_back_arrow);
+			
+			g_diary_forward_arrow.loadGraphic(Assets.arrow, true, false, 100, 100);
+			g_diary_forward_arrow.visible = false;
+			g_diary_forward_arrow.scale.x = g_diary_forward_arrow.scale.y = 0.5;
+			g_diary_forward_arrow.scale.x = -0.5;	
+			add(g_diary_forward_arrow);
+			
+			g_cellphone_big_active_region.makeGraphic(300, 180, 0x00ffffff);
+			add(g_cellphone_big_active_region);
 			
 			g_black_overlay.makeGraphic(800, 600, 0xcc000000);
 			g_black_overlay.visible = false;
@@ -129,6 +165,7 @@ package
 			add(g_lg_fam_port);
 			
 			Mouse.show();
+			Assets.init();
 
 			
 		}
@@ -173,6 +210,9 @@ package
 				case S_CELLPHONE:
 					update_cellphone();
 					break;
+				case S_DIARY:
+					update_diary();
+					break;
 			}
 			super.update();
 		}
@@ -190,22 +230,48 @@ package
 				if (mouse_in(g_fish) && g_fish.alive) {
 					hand();
 					if (jp_mouse) {
+						Assets.play_sound(Assets.s_fish);
 						g_fish.frame = 0;
 						g_fish.alive = false;
 					}
-				} 
+				} else {
+					if (jp_mouse) {
+						Assets.play_sound(Assets.s_before_fish);
+					}
+				}
 			} else {
+				
+				if (mouse_in(g_suburb_carpet)) {
+					hand();
+					if (jp_mouse) {
+						Assets.play_sound(Assets.s_floor_suburb);
+					}
+				}
 				if (mouse_in(g_book) && g_book.alive) {
 					hand();
 					if (jp_mouse) {
+						Assets.play_sound(Assets.s_bookshelf);
 						g_book.alive = false;
 						g_book.visible = true;
+					}
+				}
+				
+				if (g_book.visible && mouse_in(g_alone_book)) {
+					hand();
+					if (jp_mouse) {
+						Assets.play_sound(Assets.s_book);
+						state = S_DIARY;
+						group_suburb.exists = false;
+						g_arrow.visible = true;
+						g_diary_back_arrow.visible = g_diary_forward_arrow.visible = true;
+						g_bg.loadGraphic(Assets.bookscreen_1, false, false, 800, 600);
 					}
 				}
 				// Clicking rug reveals key
 				if (mouse_in(g_rug) && g_rug.alive) {
 					hand();
 					if (jp_mouse) {
+						Assets.play_sound(Assets.s_on_rug);
 						g_rug.alive = false;
 						g_key.visible = true;
 						g_rug.frame = 0;
@@ -217,6 +283,7 @@ package
 				if (mouse_in(g_key) && g_key.visible) {
 					hand();
 					if (jp_mouse) {
+						Assets.play_sound(Assets.s_on_key);
 						g_key.visible = false;
 						R.gs[R.GS_GOT_KEY] = true;
 					}
@@ -240,18 +307,36 @@ package
 				if (g_laundry.alive && mouse_in(g_laundry)) {
 					hand();
 					if (jp_mouse) {
+						Assets.play_sound(Assets.s_laundry);
 						g_laundry.frame = 0;
+						g_laundry.height = 50;
+						g_laundry.width = 50;
+						g_laundry.y += 60;
+						g_laundry.offset.x -= 80;
+						g_laundry.offset.y += 60;
 						g_laundry.alive = false;
+					}
+				} else if (mouse_in(g_laundry)) {
+					hand();
+					if (jp_mouse) {
+						Assets.play_sound(Assets.s_jersey);
 					}
 				}
 				
 				if (R.gs[R.GS_GOT_KEY] && mouse_in(g_suburb_door)) {
 					hand();
 					if (jp_mouse) {
+						Assets.start_song();
+						Assets.play_sound(Assets.s_enter_city);
 						group_suburb.exists = false;
 						group_city.exists = true;
 						state = S_CITY;
 						g_bg.loadGraphic(Assets.room_city, false, false, 800, 600);
+					}
+				} else if (mouse_in(g_suburb_door)) {
+					hand();
+					if (jp_mouse) {
+						Assets.play_sound(Assets.s_door_before_key);
 					}
 				}
 			}
@@ -261,9 +346,18 @@ package
 			Mouse.cursor = MouseCursor.HAND;
 		}
 		private function update_city():void {
+			
+			if (mouse_in(g_city_floor)) {
+				hand();
+				if (jp_mouse) {
+					Assets.play_sound(Assets.s_city_floor);
+				}
+			}
+			
 			if (mouse_in(g_city_door)) {
 				hand();
 				if (jp_mouse) {
+						Assets.stop_song();
 					group_city.exists = false;
 					group_suburb.exists = true;
 					state = S_SUBURB;
@@ -276,7 +370,8 @@ package
 				if (jp_mouse) {
 					state = S_CELLPHONE;
 					group_city.exists = false;
-					g_bg.loadGraphic(Assets.phonescreen_off, false, false, 800, 600);
+					Assets.play_sound(Assets.s_cellphone);
+					g_bg.loadGraphic(Assets.phonescreen_on, false, false, 800, 600);
 					g_arrow.visible = true;
 				}
 			}
@@ -302,6 +397,7 @@ package
 				hand();
 				if (jp_mouse) {
 					state = S_WINDOW;
+					Assets.play_sound(Assets.s_window);
 					group_city.exists = false;
 					g_arrow.visible = true;
 					text_window.visible = true;
@@ -404,7 +500,7 @@ package
 				hand();
 				if (jp_mouse) {
 					state = S_SUBURB;
-					group_city.exists = true;
+					group_suburb.exists = true;
 					g_arrow.visible = false;
 					g_black_overlay.visible = false;
 					g_lg_fam_port.visible = false;
@@ -422,11 +518,84 @@ package
 				if (jp_mouse) {
 					state = S_CITY;
 					group_city.exists = true;
+					Assets.stop_sound();
 					g_arrow.visible = false;
 					g_bg.loadGraphic(Assets.room_city, false, false, 800, 600);
 				}
 			} else {
 				g_arrow.frame = 0;
+			}
+			
+			if (mouse_in(g_cellphone_big_active_region)) {
+				hand();
+				if (jp_mouse) {
+					Assets.play_sound(Assets.s_cellphone_message);
+				}
+			}
+		}
+		
+		private var diary_page:int = 0;
+		private function update_diary():void {
+			if (mouse_in(g_arrow)) {
+				g_arrow.frame = 1;
+				hand();
+				if (jp_mouse) {
+					state = S_SUBURB;
+					group_suburb.exists = true;
+					g_arrow.visible = false;
+					g_diary_back_arrow.visible = g_diary_forward_arrow.visible = false;
+					g_bg.loadGraphic(Assets.room_suburb, false, false, 800, 600);
+					diary_page = 0;
+					return;
+				}
+			} else {
+				g_arrow.frame = 0;
+			}
+			
+			if (diary_page == 0) {
+				g_diary_back_arrow.visible = false;
+			} else {
+				g_diary_back_arrow.visible = true;
+			}
+			
+			if (diary_page == 3) {
+				g_diary_forward_arrow.visible = false;
+			} else {
+				g_diary_forward_arrow.visible = true;
+			}
+			
+			if (mouse_in(g_diary_back_arrow)) {
+				g_diary_back_arrow.frame = 1;
+				hand();
+				if (jp_mouse && diary_page > 0) {
+					diary_page -= 1;
+					set_diary_page();
+				}
+			} else {
+				g_diary_back_arrow.frame = 0;
+			}
+			
+			if (mouse_in(g_diary_forward_arrow)) {
+				g_diary_forward_arrow.frame = 1;
+				hand();
+				if (jp_mouse && diary_page < 3) {
+					diary_page += 1;
+					set_diary_page();
+				}
+			} else {
+				g_diary_forward_arrow.frame = 0;
+			}
+		}
+		
+		private function set_diary_page():void {
+			if (diary_page == 0) {
+				g_bg.loadGraphic(Assets.bookscreen_1, false, false, 800, 600);
+			} else if (diary_page == 1) {
+				g_bg.loadGraphic(Assets.bookscreen_2, false, false, 800, 600);
+			} else if (diary_page == 2) {
+				g_bg.loadGraphic(Assets.bookscreen_3, false, false, 800, 600);
+			} else {
+				g_bg.loadGraphic(Assets.bookscreen_4, false, false, 800, 600);
 			}
 		}
 		private function update_done():void {
