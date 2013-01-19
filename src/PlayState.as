@@ -468,7 +468,7 @@ package
 			}
 			
 			if (FlxG.keys.justPressed("ENTER")) {
-				if (cur_code == "0000000000") {
+				if (cur_code == "7732739890") {
 					g_bg.loadGraphic(Assets.windowopen);
 					text_window.text = "\n\nClick to continue";
 					state = S_DONE;
