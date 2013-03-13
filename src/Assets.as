@@ -29,10 +29,13 @@ package
 		
 		[Embed(source = "../res/ok_rug.png")] public static const rug:Class;
 		
-		[Embed(source = "../res/bookscreen_1.png")] public static const bookscreen_1:Class;
-		[Embed(source = "../res/bookscreen_2.png")] public static const bookscreen_2:Class;
-		[Embed(source = "../res/bookscreen_3.png")] public static const bookscreen_3:Class;
-		[Embed(source = "../res/bookscreen_4.png")] public static const bookscreen_4:Class;
+		[Embed(source = "../res/bookscreen01.png")] public static const bookscreen_1:Class;
+		[Embed(source = "../res/bookscreen02.png")] public static const bookscreen_2:Class;
+		[Embed(source = "../res/bookscreen03.png")] public static const bookscreen_3:Class;
+		[Embed(source = "../res/bookscreen04.png")] public static const bookscreen_4:Class;
+		[Embed(source = "../res/bookscreen05.png")] public static const bookscreen_5:Class;
+		[Embed(source = "../res/bookscreen06.png")] public static const bookscreen_6:Class;
+		[Embed(source = "../res/bookscreen07.png")] public static const bookscreen_7:Class;
 		
 		[Embed(source = "../res/cityroom.png")] public static const room_city:Class;
 		[Embed(source = "../res/suburbroom_empty.png")] public static const room_suburb:Class;
@@ -80,6 +83,7 @@ package
 		}
 		public static function start_song():void {
 			song.loadEmbedded(s_city_song, true);
+			song.volume = 0.5;
 			song.play(true);
 		}
 	}

@@ -432,9 +432,9 @@ package
 			}
 		}
 		
-		private var cur_code:String = "";
-		private var nrs:Array = new Array("ZERO", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE");
-		private var nr_map:Object = { "ZERO":0, "ONE":1, "TWO":2, "THREE":3, "FOUR":4, "FIVE":5, "SIX":6, "SEVEN":7, "EIGHT":8, "NINE":9 };
+		private var cur_code:String = "773";
+		private var nrs:Array = new Array("ZERO", "ONE", "TWO", "THREE", "FOUR", "FIVE", "SIX", "SEVEN", "EIGHT", "NINE","NUMPADZERO", "NUMPADONE", "NUMPADTWO", "NUMPADTHREE", "NUMPADFOUR", "NUMPADFIVE", "NUMPADSIX", "NUMPADSEVEN", "NUMPADEIGHT", "NUMPADNINE");
+		private var nr_map:Object = { "ZERO":0, "ONE":1, "TWO":2, "THREE":3, "FOUR":4, "FIVE":5, "SIX":6, "SEVEN":7, "EIGHT":8, "NINE":9, "NUMPADZERO":0, "NUMPADONE":1, "NUMPADTWO":2, "NUMPADTHREE":3, "NUMPADFOUR":4, "NUMPADFIVE":5, "NUMPADSIX":6, "NUMPADSEVEN":7, "NUMPADEIGHT":8, "NUMPADNINE":9 };
 		private function update_window():void {
 			if (mouse_in(g_arrow)) {
 				g_arrow.frame = 1;
@@ -445,18 +445,18 @@ package
 					g_arrow.visible = false;
 					text_window.visible = false;
 					g_bg.loadGraphic(Assets.room_city, false, false, 800, 600);
-					cur_code = "";
+					cur_code = "773";
 				}
 			} else {
 				g_arrow.frame = 0;
 			}
 			
-			text_window.text = "Enter Code\n\n" + cur_code + "\n-------------";
+			text_window.text = "Enter Code\n\n" + cur_code + "\n--- ---  ----";
 			
 			for each (var s:String in nrs) {
 				if (FlxG.keys.justPressed(s)) {
 					if (cur_code.length < 10) {
-						if (cur_code == "Incorrect") cur_code = "";
+						if (cur_code == "Incorrect") cur_code = "773";
 						cur_code += nr_map[s].toString();
 					}
 					break;
@@ -472,6 +472,8 @@ package
 					g_bg.loadGraphic(Assets.windowopen);
 					text_window.text = "\n\nClick to continue";
 					state = S_DONE;
+				} else if (cur_code == "Incorrect") {
+					cur_code = "773";
 				} else {
 					cur_code = "Incorrect";
 				}
@@ -558,7 +560,7 @@ package
 				g_diary_back_arrow.visible = true;
 			}
 			
-			if (diary_page == 3) {
+			if (diary_page == 6) {
 				g_diary_forward_arrow.visible = false;
 			} else {
 				g_diary_forward_arrow.visible = true;
@@ -578,7 +580,7 @@ package
 			if (mouse_in(g_diary_forward_arrow)) {
 				g_diary_forward_arrow.frame = 1;
 				hand();
-				if (jp_mouse && diary_page < 3) {
+				if (jp_mouse && diary_page < 6) {
 					diary_page += 1;
 					set_diary_page();
 				}
@@ -594,8 +596,14 @@ package
 				g_bg.loadGraphic(Assets.bookscreen_2, false, false, 800, 600);
 			} else if (diary_page == 2) {
 				g_bg.loadGraphic(Assets.bookscreen_3, false, false, 800, 600);
-			} else {
+			}  else if (diary_page == 3) {
 				g_bg.loadGraphic(Assets.bookscreen_4, false, false, 800, 600);
+			}  else if (diary_page == 4) {
+				g_bg.loadGraphic(Assets.bookscreen_5, false, false, 800, 600);
+			}  else if (diary_page == 5) {
+				g_bg.loadGraphic(Assets.bookscreen_6, false, false, 800, 600);
+			} else {
+				g_bg.loadGraphic(Assets.bookscreen_7, false, false, 800, 600);
 			}
 		}
 		private function update_done():void {
